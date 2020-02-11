@@ -54,7 +54,8 @@ function getTodaysWeatherForCity(city) {
         },
         complete: function() { 
             
-            getForecastForCity(city, apiKey, cityWeatherData)
+            getForecastForCity(city, apiKey, cityWeatherData);
+            getUvIndexForCity(apiKey,cityWeatherData);
          
         }
     });
@@ -109,7 +110,7 @@ function getForecastForCity(city, apiKey, cityWeatherData) {
             throw(error);
         },
         complete: function() { 
-           
+           console.log(cityWeatherData);
             renderForecast(cityWeatherData);
             
         }   
@@ -118,28 +119,24 @@ function getForecastForCity(city, apiKey, cityWeatherData) {
 
 }
 
-/*
-function getForecastForCity(city, apiKey, cityWeatherData) {
+
+function getUvIndexForCity(apiKey, cityWeatherData) {
     var cityLon = (cityWeatherData.longitude);
     var cityLat = (cityWeatherData.latitude);
     $.ajax({
     method: 'GET',
     url: 'https://api.openweathermap.org/data/2.5/uvi?appid='+apiKey+'&lat='+cityLat+'&lon='+cityLon,
-    dataType: 'jsonp',
-    headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-    },
+
     success: function(result) {
             cityWeatherData.UvIndex = {
-                cityUv: result.value,
+                    cityUv: result.value,
             };
     },        
     error: function(error) {
         throw(error);
     },
     complete: function() { 
-       console.log(cityUv);
+                    
         renderForecast(cityWeatherData);
         
     }   
@@ -147,7 +144,7 @@ function getForecastForCity(city, apiKey, cityWeatherData) {
 });
 
 }
-*/
+
 
 
 function renderForecast(cityWeatherData) {
@@ -160,6 +157,7 @@ function renderForecast(cityWeatherData) {
     $("#todayTemp").html('Temperature: ' + cityWeatherData.temperature + '°F');
     $("#todayHumidity").html('Humidity: ' + cityWeatherData.humidity + '%');
     $("#todayWind").html('Wind Speed: ' + cityWeatherData.windSpeed + 'mph');
+    $("#todayUv").html('UV Index: ' + cityWeatherData.UvIndex.cityUv);
     
     //Five day forecast
     //Day One
@@ -191,8 +189,7 @@ function renderForecast(cityWeatherData) {
     $("#dayFiveWeather").html(cityWeatherData.fiveDayForecast.dayFive.weather);
     $("#dayFiveTemperature").html('Temperature: ' + cityWeatherData.fiveDayForecast.dayFive.temperature + '°F');
     $("#dayFiveHumidity").html('Humidity: ' + cityWeatherData.fiveDayForecast.dayFive.humidity + '%');
-
-
+    
 }
 
 /*
