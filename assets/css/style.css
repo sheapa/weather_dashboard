@@ -1,0 +1,63 @@
+#page-body {
+  background-color: #D3D0CB
+}
+
+#titleBar {
+  display: block;
+  background-color: #2E5266;
+}
+
+#title {
+  display: block;
+  color: #E2C044;
+  padding: 50px;
+}
+
+#cityPresetBtnsDiv {
+  padding: 25px 0 0 0;
+}
+
+.cityPresetBtn {
+  margin: 2px 0;
+}
+
+#fiveDayForecastDiv {
+  margin-top: 25px;
+}
+
+.fiveDayForecastCard {
+  margin: 5px;
+  border: 1px solid black;
+  border-radius: 3px;
+}
+
+.card-img-top {
+  height: 36px;
+  width: 36px !important;
+}
+
+.card-header {
+  background-color: #9FB1BC !important;
+  font-weight: bolder;
+}
+
+.cityPresetBtn {
+  width: 100%;
+  padding: 5px;
+}
+
+.card {
+  background-color: #9FB1BC !important;
+}
+
+#cityInputField {
+  background-color: #9FB1BC;
+}
+
+#cityInputField.placeholder {
+  font: black;
+}
+
+#todayUv {
+  font-weight: bold;
+}

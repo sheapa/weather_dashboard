@@ -3,7 +3,7 @@ $( document ).ready(function() {
             var cityName= $( "#cityInputField" ).val(); 
             if (cityName) {
 
-                var newCityButton = $( "<button>" ).addClass( "btn btn-outline-info cityPresetBtn" ).attr( "id", cityName).html(cityName);
+                var newCityButton = $( "<button>" ).addClass( "btn btn-outline-dark cityPresetBtn" ).attr( "id", cityName).html(cityName);
                 
                 $("#cityPresetBtnsDiv").append( newCityButton );
 
@@ -42,6 +42,7 @@ function getTodaysWeatherForCity(city) {
         success: function(result) {
                 cityWeatherData = {
                     thisCity: result.name,
+                    date: result.dt,
                     longitude: result.coord.lon,
                     latitude: result.coord.lat,
                     temperature: result.main.temp,
@@ -145,68 +146,90 @@ function getUvIndexForCity(apiKey, cityWeatherData) {
 
 }
 
-
-
-function renderForecast(cityWeatherData) {
-    //var kCityTemp = (cityWeatherData.temperature);
-    //var fCityTemp = {$(kCityTemp) − 273.15) × 9/5 + 32 = -459.7°F)};
+var renderForecast = function(cityWeatherData) {
     
-    //Current Weather
+    var dayOne = cityWeatherData.fiveDayForecast.dayOne;
+    var dayTwo = cityWeatherData.fiveDayForecast.dayTwo;
+    var dayThree = cityWeatherData.fiveDayForecast.dayThree;
+    var dayFour = cityWeatherData.fiveDayForecast.dayFour;
+    var dayFive = cityWeatherData.fiveDayForecast.dayFive;
+
+    // Current Day
+    $("#selectedCityInfo").html(cityWeatherData.thisCity + " " + formatUnixToDate(cityWeatherData.date));
+    $("#todayTemp").html(kelvinToFahrenheit(cityWeatherData.temperature) + "&#176;F");
+    $("#todayHumidity").html(cityWeatherData.humidity + "% Humidity");
+    $("#todayWind").html(cityWeatherData.windSpeed + " mph Wind Speed");
+    $("#todayUv").html(cityWeatherData.UvIndex.cityUv + " UV Index").css("color", determineUvColorDisplay(cityWeatherData.UvIndex.cityUv));
+    // Day One
+    renderFiveDayForecastDay("#dayOneDate", "#dayOneWeather", "#dayOneTemperature", "#dayOneHumidity", dayOne);
+
+    // Day Two
+    renderFiveDayForecastDay("#dayTwoDate", "#dayTwoWeather", "#dayTwoTemperature", "#dayTwoHumidity", dayTwo);
+
+    // Day Three
+    renderFiveDayForecastDay("#dayThreeDate", "#dayThreeWeather", "#dayThreeTemperature", "#dayThreeHumidity", dayThree);
+
+    // Day Four
+    renderFiveDayForecastDay("#dayFourDate", "#dayFourWeather", "#dayFourTemperature", "#dayFourHumidity", dayFour);
+    
+    // Day Five
+    renderFiveDayForecastDay("#dayFiveDate", "#dayFiveWeather", "#dayFiveTemperature", "#dayFiveHumidity", dayFive);
+
     $("#forecastWindow").show();
-    $("#selectedCityInfo").html(cityWeatherData.thisCity);
-    $("#todayTemp").html('Temperature: ' + cityWeatherData.temperature + '°F');
-    $("#todayHumidity").html('Humidity: ' + cityWeatherData.humidity + '%');
-    $("#todayWind").html('Wind Speed: ' + cityWeatherData.windSpeed + 'mph');
-    $("#todayUv").html('UV Index: ' + cityWeatherData.UvIndex.cityUv);
-    
-    //Five day forecast
-    //Day One
-    $("#dayOneDate").html(cityWeatherData.fiveDayForecast.dayOne.date);
-    $("#dayOneWeather").html(cityWeatherData.fiveDayForecast.dayOne.weather);
-    $("#dayOneTemperature").html('Temperature: ' + cityWeatherData.fiveDayForecast.dayOne.temperature + '°F');
-    $("#dayOneHumidity").html('Humidity: ' + cityWeatherData.fiveDayForecast.dayOne.humidity + '%');
-
-    //Day Two
-    $("#dayTwoDate").html(cityWeatherData.fiveDayForecast.dayTwo.date);
-    $("#dayTwoWeather").html(cityWeatherData.fiveDayForecast.dayTwo.weather);
-    $("#dayTwoTemperature").html('Temperature: ' + cityWeatherData.fiveDayForecast.dayTwo.temperature + '°F');
-    $("#dayTwoHumidity").html('Humidity: ' + cityWeatherData.fiveDayForecast.dayTwo.humidity + '%');
-
-    //Day Three
-    $("#dayThreeDate").html(cityWeatherData.fiveDayForecast.dayThree.date);
-    $("#dayThreeWeather").html(cityWeatherData.fiveDayForecast.dayThree.weather);
-    $("#dayThreeTemperature").html('Temperature: ' + cityWeatherData.fiveDayForecast.dayThree.temperature + '°F');
-    $("#dayThreeHumidity").html('Humidity: ' + cityWeatherData.fiveDayForecast.dayThree.humidity + '%');
-
-    //Day Four
-    $("#dayFourDate").html(cityWeatherData.fiveDayForecast.dayFour.date);
-    $("#dayFourWeather").html(cityWeatherData.fiveDayForecast.dayFour.weather);
-    $("#dayFourTemperature").html('Temperature: ' + cityWeatherData.fiveDayForecast.dayFour.temperature + '°F');
-    $("#dayFourHumidity").html('Humidity: ' + cityWeatherData.fiveDayForecast.dayFour.humidity + '%');
-
-    //Day Five
-    $("#dayFiveDate").html(cityWeatherData.fiveDayForecast.dayFive.date);
-    $("#dayFiveWeather").html(cityWeatherData.fiveDayForecast.dayFive.weather);
-    $("#dayFiveTemperature").html('Temperature: ' + cityWeatherData.fiveDayForecast.dayFive.temperature + '°F');
-    $("#dayFiveHumidity").html('Humidity: ' + cityWeatherData.fiveDayForecast.dayFive.humidity + '%');
-    
 }
 
-/*
-$("#").html(cityWeatherData.fiveDayForecast.[i].date);
-    $("#").html(cityWeatherData.fiveDayForecast.[i].weather);
-    $("#").html(cityWeatherData.fiveDayForecast.[i].temperature);
-    $("#").html(cityWeatherData.fiveDayForecast.[i].humidity);
+var renderFiveDayForecastDay = function(dateDiv, weatherDiv, temperatureDiv, humidityDiv, dayObj) {
+    $(dateDiv).html(formatCardDate(dayObj.date));
+    $(weatherDiv).attr("src", determineWeatherIcon(dayObj.weather));
+    $(temperatureDiv).html(kelvinToFahrenheit(dayObj.temperature) + "&#176;F");
+    $(humidityDiv).html(dayObj.humidity + "% humidity");
 }
-*/
 
-/*
-var keys = fiveDayForecast;
-    for (var i = 0;  i < keys.length; i++) {
-    $("#").html(keys[i].date);
-    $("#").html([i].weather);
-    $("#").html([i].temperature);
-    $("#").html([i].humidity);
-    };
+// Helper functions
+var determineWeatherIcon = function(weather) {
+    switch (weather) {
+        case 'Clear':
+            return "./assets/images/sunny.png";
+        case 'Clouds':
+            return "./assets/images/cloudy.png";
+        case 'Rain':
+            return "./assets/images/rainy.png";
+        case 'Snow':
+            return "./assets/images/snowy.png"
+        default:
+            return "";
+    }
 }
-*/
+
+var formatCardDate = function(dateString) {
+    var newDate;
+    var removeHours = dateString.slice(0, 10);
+    var dateArray = removeHours.split("-")
+    newDate = dateArray[1] + "/" + dateArray[2] + "/" + dateArray[0];
+    return newDate;
+}
+
+var formatUnixToDate = function(timestamp) {
+    var a = new Date(timestamp * 1000);
+    var date = a.getDate();
+    var month = a.getMonth() + 1;
+    var year = a.getFullYear();
+    var timeString = month + "/" + date + "/" + year;
+    return timeString; 
+}
+
+var kelvinToFahrenheit = function(k) {
+    var f = Math.round(((k - 273.15) * 9/5) + 32);
+    return f;
+}
+
+var determineUvColorDisplay = function(cityUv) {
+    if (cityUv >= 6) {
+        return 'red';
+    } else if (cityUv >= 3) {
+        return '#E2C044';
+    } else {
+        return 'green';
+    }
+}
+
